@@ -261,6 +261,9 @@ print('RMSE: %.2f' % rmse)
 
 Now, mean_squared-error has accuracy very higher than Arima Model.
 
+![image](https://user-images.githubusercontent.com/110837675/216005548-73bf4cf6-24e3-4ad6-b3b6-df18067ced30.png)
+
+
 # V. Predict next 6 months future.
 ```php
 # Tính toán dữ liệu đầu vào cho 6 tháng tiếp theo
