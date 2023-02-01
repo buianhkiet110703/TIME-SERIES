@@ -248,21 +248,6 @@ plt.show()
 
 Looking at the picture, I see that the accuracy is quite high, the difference is not much.
 
-I will evaluate model and compare wi0th Arima Model.
-```php
-from sklearn.metrics import mean_squared_error
-from math import sqrt
-mse= mean_squared_error(y_pred_test, y_test)
-rmse=sqrt(mse)
-print('MSE: %.2f' % mse)
-print('RMSE: %.2f' % rmse)
-```
-![image](https://user-images.githubusercontent.com/110837675/216000777-0308ce7c-aab4-4a78-a441-377573ff9fcc.png)
-
-Now, mean_squared-error has accuracy very higher than Arima Model.
-
-![image](https://user-images.githubusercontent.com/110837675/216005548-73bf4cf6-24e3-4ad6-b3b6-df18067ced30.png)
-
 
 # V. Predict next 6 months future.
 ```php
