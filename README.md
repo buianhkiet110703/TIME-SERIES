@@ -1,6 +1,6 @@
-# TIME-SERIES
+## Time_series with Arima and  Long short term memory (LSTM)
 
-# I. Introduce Dataset 
+# Introduce Dataset 
 
 Here is the Bitcoin dataset including the columns: 
 
@@ -16,11 +16,11 @@ Here is the Bitcoin dataset including the columns:
      
      - Volume: Number of units traded in a day
      
- This dataset is also available in python using 'import yfinance' to get the dataset.
+ This dataset is also available in python using 'import yfinance' to get the dataset. In this dataset, I will Predict with 'Adj Close' Columns.
  
-With this data set, we will use model time series to predict them, in this article we will use that model: ARIMA
+# A. MODEL ARIMA
  
- # II. DATA CLEANING AND VISUALIZE
+ # I. DATA CLEANING AND VISUALIZE
  
 First we check to see if any columns of data are NAN.
    ```php
@@ -28,7 +28,8 @@ First we check to see if any columns of data are NAN.
    ```
    output:
    
-   ![](https://scontent.fsgn2-5.fna.fbcdn.net/v/t1.15752-9/313457409_1767206376981273_6702053681674880099_n.png?_nc_cat=106&ccb=1-7&_nc_sid=ae9488&_nc_ohc=BBfmdA5T1qsAX_KaUiE&_nc_ht=scontent.fsgn2-5.fna&oh=03_AdR2QStrm2fwrLbyCUrSSVJE9kVuitkUV_8zvqAfSlbblg&oe=63947F3C)
+![image](https://user-images.githubusercontent.com/110837675/215991013-9c531f77-abd3-4329-a786-8b6a5cf3129a.png)
+
    
 Very charging data will not have NAN data.
    
@@ -48,7 +49,7 @@ ax5.set(title='biểu đồ tương qua giữa Adj Close và Volume', xlabel='Ad
 ```
  Output:
  
-![](https://scontent.fsgn2-8.fna.fbcdn.net/v/t1.15752-9/313786780_512466404137844_6942073010345852627_n.png?_nc_cat=102&ccb=1-7&_nc_sid=ae9488&_nc_ohc=mZHbJP7iKHUAX9pf8qY&_nc_ht=scontent.fsgn2-8.fna&oh=03_AdTdec_7SovSfYSyuqVoB2tiP-U5BHka67epy85epH8Rvg&oe=6395CCC5)
+![image](https://user-images.githubusercontent.com/110837675/215991378-da945b73-e949-430d-9ee5-16e696e5d7a8.png)
    
    
 Plot a preview of the dataset's original raw data.
@@ -58,11 +59,11 @@ plt.grid(True)
 plt.plot(x)
 plt.xlabel('Date')
 plt.ylabel('Adj Close')
-plt.title('biểu đồ thể hiện Adj Close theo các năm')
+plt.title('chart showing Adj Close by years')
 ```
 output:
 
-![](https://scontent.fsgn2-7.fna.fbcdn.net/v/t1.15752-9/308809403_481410593973806_2064451325614451912_n.png?_nc_cat=109&ccb=1-7&_nc_sid=ae9488&_nc_ohc=TqE4kkvR_mIAX-a6LXI&_nc_ht=scontent.fsgn2-7.fna&oh=03_AdTKm5X4XYQ70Cenci8U6FthcN5N3fKJ7K0oXXTE60bZ1w&oe=63947874)
+![image](https://user-images.githubusercontent.com/110837675/215991965-94af5130-5bd5-4642-b5a5-5328d1871d54.png)
 
 Next, I will divide the data into a train set and a test set to build the ARIMA model.
 
@@ -79,11 +80,12 @@ plt.figure(figsize=(12,6))
 plt.grid(True)
 plt.xlabel('Date')
 plt.ylabel('ADJ close')
+plt.title('Train/Test Split')
 plt.plot(x[0: to_row],'green', label= 'training_data')
 plt.plot(x[to_row:],'blue', label= 'testing_data')
 plt.legend()
 ```
-![image](https://user-images.githubusercontent.com/110837675/206652189-48d374e1-d0a0-40eb-9fbc-5c029229cf1f.png)
+![image](https://user-images.githubusercontent.com/110837675/215992425-43620b3b-fd1e-4df5-996f-0bc17f674438.png)
 
 Draw an AFC and PACF graph to see the correlation of Lag_time
 
@@ -106,7 +108,7 @@ plt.show()
 ```
 ![image](https://user-images.githubusercontent.com/110837675/206653921-bf4ddcbd-ad6c-425a-bf5f-45d4a1140263.png)
 
-# III. Build Model
+# II. Build Model
 
 Use auto arima to find the best AIC for the model.
 
@@ -165,9 +167,149 @@ plt.legend()
 
 The predicted price line and the actual price line are also quite close to each other, which shows that this model can work well.
 
+# B. Long short term memory (LSTM)
 
+# I.Data preprocessing
 
+I will split the 'Adj close' column data from the original dataset into a new one. Then, I will Scaler data.
+```php
+sequence = df['Adj Close'].to_frame()
+from sklearn.preprocessing import MinMaxScaler
+sc= MinMaxScaler(feature_range=(0,1))
+scaled= sc.fit_transform(sequence)
 
+sequence= scaled
+```
+I will split Training and Testing data.
+```php
+timestep = 10
+x_train, y_train = [], []
+for i in range(timestep, len(train)):
+    x_train.append(train[i - timestep:i])
+    y_train.append(train[i])
+
+x_test, y_test = [], []
+for i in range(timestep, len(test)):
+    x_test.append(test[i - timestep:i])
+    y_test.append(test[i])
+```
+This code is used to generate input data for the prediction model. First, we define a variable timestep = 10, that is, we will use the previous 10 values of the value in the train set to predict the next value.
+
+Then we use two for loops to generate the input data. The first loop uses train set to generate x_train and y_train data, for each i value in train set from timestep to end of set, we will create an element x_train which is a list of 10 previous values of train set and an element y_train is the value of train set at position i.
+
+The second loop creates the same as the first, but uses the test set instead of the train set.
+
+I will convert List into array.
+
+```php
+x_train = np.array(x_train)
+y_train = np.array(y_train)
+x_test = np.array(x_test)
+y_test = np.array(y_test)
+```
+
+This code changes the shape of the set x_train and x_test from 2-dimensional to 3-dimensional. x_train.shape[0] returns the number of rows, x_train.shape[1] returns the number of columns, and 1 is the number of dimensions (number of features or number of channels). The new shape of x_train and x_test is the number of rows x number of columns x 1, which helps the LSTM model to recognize that the data being processed is temporal data with one dimension.
+```php
+x_train = x_train.reshape(x_train.shape[0], x_train.shape[1], 1)
+x_test = x_test.reshape(x_test.shape[0], x_test.shape[1], 1)
+```
+
+# III. Build Model
+
+```php
+model =Sequential([LSTM(units=100, input_shape=(timestep, 1)),Dense(1)])
+model.compile(loss='mean_squared_error', optimizer='adam')
+model.fit(x_train, y_train, epochs=100, batch_size=32)
+```
+# IV. Evaluate Model
+
+Predict on train and test data.
+
+``php
+y_pred_train = model.predict(x_train)
+y_pred_test = model.predict(x_test)
+```
+Plot Actual Value compare with Predictions.
+```php
+plt.figure(figsize=(12,6))
+plt.plot(df.index[:len(y_train)], y_train, label='Real Train')
+plt.plot(df.index[:len(y_pred_train)], y_pred_train, label='Prediction (Train)')
+start_index = len(y_train)
+end_index = start_index + len(y_test)
+plt.plot(df.index[start_index:end_index], y_test, label='Real Test')
+plt.plot(df.index[start_index:end_index], y_pred_test, label='Prediction (Test)')
+plt.xlabel("Index")
+plt.ylabel("Price")
+plt.title('Actual Value compare with Predictions')
+plt.legend()
+plt.show()
+```
+![image](https://user-images.githubusercontent.com/110837675/215999607-b6c22d5e-f731-48c3-99c0-cb90dd81f355.png)
+
+Looking at the picture, I see that the accuracy is quite high, the difference is not much.
+
+I will evaluate model and compare wi0th Arima Model.
+```php
+from sklearn.metrics import mean_squared_error
+from math import sqrt
+mse= mean_squared_error(y_pred_test, y_test)
+rmse=sqrt(mse)
+print('MSE: %.2f' % mse)
+print('RMSE: %.2f' % rmse)
+```
+![image](https://user-images.githubusercontent.com/110837675/216000777-0308ce7c-aab4-4a78-a441-377573ff9fcc.png)
+
+Now, mean_squared-error has accuracy very higher than Arima Model.
+
+# V. Predict next 6 months future.
+```php
+# Tính toán dữ liệu đầu vào cho 6 tháng tiếp theo
+from datetime import timedelta
+last_6month = y_test[-180:]
+input_data = []
+for i in range(len(last_6month) - timestep):
+    input_data.append(last_6month[i:i + timestep])
+input_data = np.array(input_data).reshape(-1, timestep, 1)
+
+# Dự đoán giá trị 6 tháng tiếp theo
+y_pred_6month = model.predict(input_data)
+
+# Tạo DataFrame cho dữ liệu dự đoán
+df_pred_6month = pd.DataFrame({'Price': y_pred_6month.flatten()})
+
+# Tạo cột "Date" tương ứng với dữ liệu dự đoán
+last_date = df.index[-1]
+df_pred_6month['Date'] = [last_date + timedelta(days=i) for i in range(1, len(df_pred_6month) + 1)]
+```
+Plot Predict next 6 months future:
+
+```php
+# Vẽ hình
+plt.figure(figsize=(12,6))
+plt.plot(df_pred_6month['Date'], df_pred_6month['Price'], label='Prediction (6 Months)')
+plt.xlabel("Date")
+plt.ylabel("Price")
+plt.title('Predict next 6 months future')
+plt.legend()
+plt.show()
+```
+![image](https://user-images.githubusercontent.com/110837675/216003284-3c30e8ca-480b-49e5-a72a-8a76f3de540c.png)
+
+```php
+plt.figure(figsize=(12,6))
+plt.plot(df.index[:len(y_train)], y_train, label='Real Train')
+plt.plot(df.index[:len(y_pred_train)], y_pred_train, label='Prediction (Train)')
+start_index = len(y_train)
+end_index = start_index + len(y_test)
+plt.plot(df.index[start_index:end_index], y_test, label='Real Test')
+plt.plot(df.index[start_index:end_index], y_pred_test, label='Prediction (Test)')
+plt.plot(df_pred_6month['Date'], df_pred_6month['Price'], label='Prediction (6 Months)')
+plt.xlabel("Index")
+plt.ylabel("Price")
+plt.legend()
+plt.show()
+```
+![image](https://user-images.githubusercontent.com/110837675/216004058-0381fae0-7795-4975-9a07-93d6b09d8c99.png)
 
    
 
