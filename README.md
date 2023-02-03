@@ -223,12 +223,17 @@ model.fit(x_train, y_train, epochs=100, batch_size=32)
 ```
 # IV. Evaluate Model
 
-Predict on train and test data.
+Return data to original value.
 
-``php
+```php
+y_train= sc.inverse_transform(y_train)
 y_pred_train = model.predict(x_train)
+y_pred_train= sc.inverse_transform(y_pred_train)
+y_test= sc.inverse_transform(y_test)
 y_pred_test = model.predict(x_test)
+y_pred_test=sc.inverse_transform(y_pred_test)
 ```
+
 Plot Actual Value compare with Predictions.
 ```php
 plt.figure(figsize=(12,6))
@@ -244,10 +249,10 @@ plt.title('Actual Value compare with Predictions')
 plt.legend()
 plt.show()
 ```
-![image](https://user-images.githubusercontent.com/110837675/215999607-b6c22d5e-f731-48c3-99c0-cb90dd81f355.png)
+![image](https://user-images.githubusercontent.com/110837675/216515294-06fd7c12-6fc5-4932-8d51-e2c479800f68.png)
 
-Looking at the picture, I see that the accuracy is quite high, the difference is not much.
-
+Mean_squared_error of model.
+![image](https://user-images.githubusercontent.com/110837675/216515357-985a91ec-3c00-4f3f-9579-b6b0fe7b8b31.png)
 
 # V. Predict next 6 months future.
 ```php
@@ -261,7 +266,7 @@ input_data = np.array(input_data).reshape(-1, timestep, 1)
 
 # Dự đoán giá trị 6 tháng tiếp theo
 y_pred_6month = model.predict(input_data)
-
+y_pred_6month= sc.inverse_transform(y_pred_6month)
 # Tạo DataFrame cho dữ liệu dự đoán
 df_pred_6month = pd.DataFrame({'Price': y_pred_6month.flatten()})
 
@@ -281,23 +286,36 @@ plt.title('Predict next 6 months future')
 plt.legend()
 plt.show()
 ```
-![image](https://user-images.githubusercontent.com/110837675/216003284-3c30e8ca-480b-49e5-a72a-8a76f3de540c.png)
+![image](https://user-images.githubusercontent.com/110837675/216515479-ca1e4382-3172-47db-ba93-b89d11a526ca.png)
 
 ```php
-plt.figure(figsize=(12,6))
+plt.figure(figsize=(15,10))
+
+plt.subplot(3,1,1)
 plt.plot(df.index[:len(y_train)], y_train, label='Real Train')
 plt.plot(df.index[:len(y_pred_train)], y_pred_train, label='Prediction (Train)')
+plt.xlabel("Index")
+plt.ylabel("Price")
+plt.legend()
+
+plt.subplot(3,1,2)
 start_index = len(y_train)
 end_index = start_index + len(y_test)
 plt.plot(df.index[start_index:end_index], y_test, label='Real Test')
 plt.plot(df.index[start_index:end_index], y_pred_test, label='Prediction (Test)')
-plt.plot(df_pred_6month['Date'], df_pred_6month['Price'], label='Prediction (6 Months)')
 plt.xlabel("Index")
 plt.ylabel("Price")
 plt.legend()
+
+plt.subplot(3,1,3)
+plt.plot(df_pred_6month['Date'], df_pred_6month['Price'], label='Prediction (6 Months)')
+plt.xlabel("Date")
+plt.ylabel("Price")
+plt.legend()
+
 plt.show()
 ```
-![image](https://user-images.githubusercontent.com/110837675/216004058-0381fae0-7795-4975-9a07-93d6b09d8c99.png)
+![image](https://user-images.githubusercontent.com/110837675/216515630-f3051c5e-7071-4a81-84f0-052d6f326a3c.png)
 
    
 
